@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "AndroidRuntime"
-//#define LOG_NDEBUG 0
+#define LOG_TAG "yutao"
+#define LOG_NDEBUG 0
 
 #include <android_runtime/AndroidRuntime.h>
 #include <binder/IBinder.h>
@@ -1009,12 +1009,14 @@ void AndroidRuntime::start(const char* className, const Vector<String8>& options
     ALOGD(">>>>>> START %s uid %d <<<<<<\n",
             className != NULL ? className : "(unknown)", getuid());
 
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     static const String8 startSystemServer("start-system-server");
 
     /*
      * 'startSystemServer == true' means runtime is obsolete and not run from
      * init.rc anymore, so we print out the boot start event here.
      */
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     for (size_t i = 0; i < options.size(); ++i) {
         if (options[i] == startSystemServer) {
            /* track our progress through the boot sequence */
@@ -1023,6 +1025,7 @@ void AndroidRuntime::start(const char* className, const Vector<String8>& options
         }
     }
 
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     const char* rootDir = getenv("ANDROID_ROOT");
     if (rootDir == NULL) {
         rootDir = "/system";
@@ -1040,6 +1043,7 @@ void AndroidRuntime::start(const char* className, const Vector<String8>& options
     JniInvocation jni_invocation;
     jni_invocation.Init(NULL);
     JNIEnv* env;
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     if (startVm(&mJavaVM, &env, zygote) != 0) {
         return;
     }
@@ -1092,6 +1096,8 @@ void AndroidRuntime::start(const char* className, const Vector<String8>& options
             ALOGE("JavaVM unable to find main() in '%s'\n", className);
             /* keep going */
         } else {
+            // gCurRuntime->onStarted();
+            gCurRuntime->onZygoteInit();
             env->CallStaticVoidMethod(startClass, startMeth, strArray);
 
 #if 0
@@ -1101,6 +1107,7 @@ void AndroidRuntime::start(const char* className, const Vector<String8>& options
         }
     }
     free(slashClassName);
+    gCurRuntime->onExit(-1);
 
     ALOGD("Shutting down VM\n");
     if (mJavaVM->DetachCurrentThread() != JNI_OK)

@@ -30,7 +30,7 @@ LOCAL_MULTILIB := both
 LOCAL_MODULE_STEM_32 := app_process32_bruce
 LOCAL_MODULE_STEM_64 := app_process64_bruce
 
-LOCAL_CFLAGS += -Wall -Werror -Wunused -Wunreachable-code
+LOCAL_CFLAGS += -Wall -Wunused -Wunreachable-code
 
 include $(BUILD_EXECUTABLE)
 
@@ -69,7 +69,7 @@ LOCAL_ADDRESS_SANITIZER := true
 LOCAL_CLANG := true
 LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)/asan
 
-LOCAL_CFLAGS += -Wall -Werror -Wunused -Wunreachable-code
+#LOCAL_CFLAGS += 
 
 include $(BUILD_EXECUTABLE)
 

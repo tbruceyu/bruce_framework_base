@@ -5,7 +5,8 @@
  *
  */
 
-#define LOG_TAG "appproc"
+#define LOG_TAG "yutao"
+#define LOG_NDEBUG 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -185,6 +186,7 @@ static const char ZYGOTE_NICE_NAME[] = "zygote";
 
 int main(int argc, char* const argv[])
 {
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) {
         // Older kernels don't understand PR_SET_NO_NEW_PRIVS and return
         // EINVAL. Don't die on such kernels.
@@ -194,6 +196,7 @@ int main(int argc, char* const argv[])
         }
     }
 
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     AppRuntime runtime(argv[0], computeArgBlockSize(argc, argv));
     // Process command line arguments
     // ignore argv[0]
@@ -298,19 +301,14 @@ int main(int argc, char* const argv[])
         }
     }
 
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     if (!niceName.isEmpty()) {
         runtime.setArgv0(niceName.string());
         set_process_name(niceName.string());
     }
 
-    if (zygote) {
-        runtime.start("com.android.internal.os.ZygoteInit", args, zygote);
-    } else if (className) {
-        runtime.start("com.android.internal.os.RuntimeInit", args, zygote);
-    } else {
-        fprintf(stderr, "Error: no class name or --zygote supplied.\n");
-        app_usage();
-        LOG_ALWAYS_FATAL("app_process: no class name or --zygote supplied.");
-        return 10;
-    }
+
+    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
+        runtime.start("android.app.ActivityThreadBruce", args, false);
+
 }
