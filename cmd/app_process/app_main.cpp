@@ -186,7 +186,6 @@ static const char ZYGOTE_NICE_NAME[] = "zygote";
 
 int main(int argc, char* const argv[])
 {
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) {
         // Older kernels don't understand PR_SET_NO_NEW_PRIVS and return
         // EINVAL. Don't die on such kernels.
@@ -196,7 +195,6 @@ int main(int argc, char* const argv[])
         }
     }
 
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     AppRuntime runtime(argv[0], computeArgBlockSize(argc, argv));
     // Process command line arguments
     // ignore argv[0]
@@ -239,41 +237,21 @@ int main(int argc, char* const argv[])
     }
 
     // Parse runtime arguments.  Stop at first unrecognized option.
-    bool zygote = false;
     bool startSystemServer = false;
-    bool application = false;
-    String8 niceName;
-    String8 className;
-
-    ++i;  // Skip unused "parent dir" argument.
-    while (i < argc) {
-        const char* arg = argv[i++];
-        if (strcmp(arg, "--zygote") == 0) {
-            zygote = true;
-            niceName = ZYGOTE_NICE_NAME;
-        } else if (strcmp(arg, "--start-system-server") == 0) {
-            startSystemServer = true;
-        } else if (strcmp(arg, "--application") == 0) {
-            application = true;
-        } else if (strncmp(arg, "--nice-name=", 12) == 0) {
-            niceName.setTo(arg + 12);
-        } else if (strncmp(arg, "--", 2) != 0) {
-            className.setTo(arg);
-            break;
-        } else {
-            --i;
-            break;
-        }
-    }
 
     Vector<String8> args;
+    String8 className = String8(argv[i++]);
+    while (i < argc) {
+        const char* arg = argv[i++];
+        args.add(String8(arg));
+    }
+
     if (!className.isEmpty()) {
         // We're not in zygote mode, the only argument we need to pass
         // to RuntimeInit is the application argument.
         //
         // The Remainder of args get passed to startup class main(). Make
         // copies of them before we overwrite them with the process name.
-        args.add(application ? String8("application") : String8("tool"));
         runtime.setClassNameAndArgs(className, argc - i, argv + i);
     } else {
         // We're in zygote mode.
@@ -301,14 +279,6 @@ int main(int argc, char* const argv[])
         }
     }
 
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
-    if (!niceName.isEmpty()) {
-        runtime.setArgv0(niceName.string());
-        set_process_name(niceName.string());
-    }
 
-
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
-        runtime.start("android.app.ActivityThreadBruce", args, false);
-
+    runtime.start(runtime.mClassName, args, false);
 }

@@ -112,6 +112,8 @@ public class ActivityThreadBruce {
                 handlerMethod.setAccessible(true);
                 sMainThreadHandlerField.set(activityThreadClass, handlerMethod.invoke(thread));
             }
+            IApplicationThread applicationThread = thread.getApplicationThread();
+            applicationThread.bindApplication();
 
             if (false) {
                 Looper.myLooper().setMessageLogging(new

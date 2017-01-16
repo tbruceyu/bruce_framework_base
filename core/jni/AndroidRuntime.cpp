@@ -1007,25 +1007,8 @@ jstring AndroidRuntime::NewStringLatin1(JNIEnv* env, const char* bytes) {
 void AndroidRuntime::start(const char* className, const Vector<String8>& options, bool zygote)
 {
     ALOGD(">>>>>> START %s uid %d <<<<<<\n",
-            className != NULL ? className : "(unknown)", getuid());
+    className != NULL ? className : "(unknown)", getuid());
 
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
-    static const String8 startSystemServer("start-system-server");
-
-    /*
-     * 'startSystemServer == true' means runtime is obsolete and not run from
-     * init.rc anymore, so we print out the boot start event here.
-     */
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
-    for (size_t i = 0; i < options.size(); ++i) {
-        if (options[i] == startSystemServer) {
-           /* track our progress through the boot sequence */
-           const int LOG_BOOT_PROGRESS_START = 3000;
-           LOG_EVENT_LONG(LOG_BOOT_PROGRESS_START,  ns2ms(systemTime(SYSTEM_TIME_MONOTONIC)));
-        }
-    }
-
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     const char* rootDir = getenv("ANDROID_ROOT");
     if (rootDir == NULL) {
         rootDir = "/system";
@@ -1043,7 +1026,6 @@ void AndroidRuntime::start(const char* className, const Vector<String8>& options
     JniInvocation jni_invocation;
     jni_invocation.Init(NULL);
     JNIEnv* env;
-    ALOGV("func:%s, line:%d", __FUNCTION__, __LINE__);
     if (startVm(&mJavaVM, &env, zygote) != 0) {
         return;
     }
